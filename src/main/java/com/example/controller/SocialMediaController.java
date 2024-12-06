@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.entity.Account;
 import com.example.exception.AccountAlreadyExistsException;
+import com.example.exception.InvalidUsernameException;
 import com.example.exception.InvalidPasswordException;
 import com.example.service.AccountService;
 
@@ -31,33 +32,27 @@ public class SocialMediaController {
         try {
             Account newAccount = accountService.registerAccount(acct);
             return ResponseEntity.status(200).body(newAccount);
-
+            
         } catch (AccountAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-
+            
         } catch (InvalidPasswordException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
-}
+    
+    @PostMapping("/login")
+    public ResponseEntity<Account> login(@RequestBody Account acct) {
+        try {
+            Account user = accountService.login(acct.getUsername(), acct.getPassword());
+            return ResponseEntity.status(HttpStatus.OK).body(user);
 
+        } catch (InvalidUsernameException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 
-
-/**
- *     @GetMapping("/string/{text}")
-    public String getStringPathVariable(@PathVariable String text){
-        return text;
+        } catch (InvalidPasswordException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
     }
- * 
- *      
-@PostMapping(value = "/requestbody") <- can omit 'value = '
-public Sample postSample(@RequestBody Sample pojo){
-    //you will need to change the method's parameters and return the extracted request body.
-    return pojo;
 }
 
-@GetMapping("/exampleHeaders")
-public ResponseEntity headers(@RequestBody Sample sample){
-    return ResponseEntity.status(200).header("content-type", "application/zip").body(sample);
-}
- */
