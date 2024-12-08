@@ -41,4 +41,9 @@ public class MessageService {
         
         return messageRepository.save(message);
     }
+
+    public Message getMessageById(int messageId){
+        Optional<Message> foundMessage = messageRepository.findById(messageId);
+        return foundMessage.orElse(null);
+    }
 }
