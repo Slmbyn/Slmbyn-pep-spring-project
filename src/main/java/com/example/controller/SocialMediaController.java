@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.entity.Account;
 import com.example.entity.Message;
 import com.example.exception.AccountAlreadyExistsException;
+import com.example.exception.InvalidMessageLengthException;
 import com.example.exception.InvalidUsernameException;
+import com.example.exception.UserDoesntExistException;
 import com.example.exception.InvalidPasswordException;
 import com.example.service.AccountService;
 import com.example.service.MessageService;
@@ -65,6 +67,18 @@ public class SocialMediaController {
     @GetMapping("/messages")
     public ResponseEntity<List<Message>> getAllMessages(){
         return ResponseEntity.status(HttpStatus.OK).body(messageService.getAllMessages());
+    }
+
+    @PostMapping("/messages")
+    public ResponseEntity<Message> newMessage(@RequestBody Message message){
+        try {
+            Message newMessage = messageService.newMessage(message);
+            return ResponseEntity.status(200).body(newMessage);
+        } catch (UserDoesntExistException e) {
+            return ResponseEntity.status(400).body(null);
+        } catch (InvalidMessageLengthException e) {
+            return ResponseEntity.status(400).body(null);
+        }
     }
 }
 
