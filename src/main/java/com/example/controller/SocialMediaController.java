@@ -110,7 +110,6 @@ public class SocialMediaController {
         try {
             String messageText = messageRequest.getMessageText();
             Integer updatedMessage = messageService.updateMessageTextById(messageId, messageText);
-            System.out.println("Updated MESSAGE IN CONTROLLER: " + updatedMessage);
             if( updatedMessage == 1){
                 return ResponseEntity.status(HttpStatus.OK).body(updatedMessage);
             }
@@ -123,6 +122,11 @@ public class SocialMediaController {
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    @GetMapping("/accounts/{accountId}/messages")
+    public ResponseEntity<List<Message>> getAllMessagesByAccountId(@PathVariable int accountId){
+        return ResponseEntity.status(HttpStatus.OK).body(messageService.getAllMessagesByAccountId(accountId));
     }
 }
 

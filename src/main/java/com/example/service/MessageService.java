@@ -61,7 +61,6 @@ public class MessageService {
     }
 
     public int updateMessageTextById(int messageId, String messageText){
-        System.out.println("PARAMETERS: " + messageId + " " + messageText);
 
         // message must exist
         Optional<Message> foundMessage = messageRepository.findById(messageId);
@@ -73,13 +72,15 @@ public class MessageService {
         if(messageText.isEmpty() || messageText.length() > 255 ) {
             throw new InvalidMessageLengthException();
         }
-        System.out.println("FOUNDMESSAGEEE: " + foundMessage.get());
         
         foundMessage.get().setMessageText(messageText);
         messageRepository.save(foundMessage.get());
-        System.out.println("SAVED MESSAGEEEE: " + foundMessage.get());
 
         return 1;
+    }
+
+    public List<Message> getAllMessagesByAccountId(int accountId){
+        return messageRepository.findAllByPostedBy(accountId);
     }
 
 
