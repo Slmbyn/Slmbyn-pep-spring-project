@@ -11,6 +11,7 @@ import com.example.repository.MessageRepository;
 import com.example.entity.Account;
 import com.example.entity.Message;
 import com.example.exception.InvalidMessageLengthException;
+import com.example.exception.MessageDoesntExistException;
 import com.example.exception.UserDoesntExistException;
 
 
@@ -51,10 +52,35 @@ public class MessageService {
         Optional<Message> foundMessage = messageRepository.findById(messageId);
 
         if(foundMessage.isEmpty()){
-            return 0;
+            //Todo: update this to throw exception
+            return 0; 
         }
 
         messageRepository.deleteById(messageId);
         return 1;
     }
+
+    public int updateMessageTextById(int messageId, String messageText){
+        System.out.println("PARAMETERS: " + messageId + " " + messageText);
+
+        // message must exist
+        Optional<Message> foundMessage = messageRepository.findById(messageId);
+        if(foundMessage.isEmpty()){
+            throw new MessageDoesntExistException();
+        }
+
+        // new text is not blank and less than 255
+        if(messageText.isEmpty() || messageText.length() > 255 ) {
+            throw new InvalidMessageLengthException();
+        }
+        System.out.println("FOUNDMESSAGEEE: " + foundMessage.get());
+        
+        foundMessage.get().setMessageText(messageText);
+        messageRepository.save(foundMessage.get());
+        System.out.println("SAVED MESSAGEEEE: " + foundMessage.get());
+
+        return 1;
+    }
+
+
 }

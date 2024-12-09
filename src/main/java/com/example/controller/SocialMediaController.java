@@ -7,16 +7,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.dto.MessageDTO;
 import com.example.entity.Account;
 import com.example.entity.Message;
 import com.example.exception.AccountAlreadyExistsException;
 import com.example.exception.InvalidMessageLengthException;
 import com.example.exception.InvalidUsernameException;
+import com.example.exception.MessageDoesntExistException;
 import com.example.exception.UserDoesntExistException;
 import com.example.exception.InvalidPasswordException;
 import com.example.service.AccountService;
@@ -91,12 +94,35 @@ public class SocialMediaController {
 
     @DeleteMapping("/messages/{messageId}")
     public ResponseEntity<Integer> deleteMessageById(@PathVariable int messageId){
+
+        //TODO: put a try catch block for exception
+
         Integer deleted = messageService.deleteMessageById(messageId);
-        if( deleted == 0){
-            return ResponseEntity.status(HttpStatus.OK).build();
+        if( deleted == 1){
+            return ResponseEntity.status(HttpStatus.OK).body(deleted);
+        }
+        
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PatchMapping("/messages/{messageId}")
+    public ResponseEntity<Integer> updateMessageTextById(@PathVariable int messageId, @RequestBody MessageDTO messageRequest){
+        try {
+            String messageText = messageRequest.getMessageText();
+            Integer updatedMessage = messageService.updateMessageTextById(messageId, messageText);
+            System.out.println("Updated MESSAGE IN CONTROLLER: " + updatedMessage);
+            if( updatedMessage == 1){
+                return ResponseEntity.status(HttpStatus.OK).body(updatedMessage);
+            }
+
+        } catch (MessageDoesntExistException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
+        } catch (InvalidMessageLengthException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(deleted);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }
 
