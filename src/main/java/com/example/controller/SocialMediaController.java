@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,10 +45,10 @@ public class SocialMediaController {
             return ResponseEntity.status(200).body(newAccount);
             
         } catch (AccountAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
             
         } catch (InvalidPasswordException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
     
@@ -58,10 +59,10 @@ public class SocialMediaController {
             return ResponseEntity.status(HttpStatus.OK).body(user);
 
         } catch (InvalidUsernameException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
         } catch (InvalidPasswordException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
@@ -74,11 +75,11 @@ public class SocialMediaController {
     public ResponseEntity<Message> newMessage(@RequestBody Message message){
         try {
             Message newMessage = messageService.newMessage(message);
-            return ResponseEntity.status(200).body(newMessage);
+            return ResponseEntity.status(HttpStatus.OK).body(newMessage);
         } catch (UserDoesntExistException e) {
-            return ResponseEntity.status(400).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (InvalidMessageLengthException e) {
-            return ResponseEntity.status(400).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -86,6 +87,16 @@ public class SocialMediaController {
     public ResponseEntity<Message> getMessageById(@PathVariable int messageId){
         return ResponseEntity.status(HttpStatus.OK).body(messageService.getMessageById(messageId));
 
+    }
+
+    @DeleteMapping("/messages/{messageId}")
+    public ResponseEntity<Integer> deleteMessageById(@PathVariable int messageId){
+        Integer deleted = messageService.deleteMessageById(messageId);
+        if( deleted == 0){
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(deleted);
     }
 }
 
